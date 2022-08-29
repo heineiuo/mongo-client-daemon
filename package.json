@@ -14,8 +14,8 @@
   "devDependencies": {
     "node-ts-scripts": "^0.27.2"
   },
-  "dependencies": {
-    "mongodb": "^4.9.0"
+  "peerDependencies": {
+    "mongodb": ">=4.9.0"
   },
   "repository": {
     "type": "git",
