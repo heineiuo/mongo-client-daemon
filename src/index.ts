@@ -1,1 +1,1 @@
-export * from './MongoSessionDaemon'
+export * from './MongoSessionDaemon.js'
