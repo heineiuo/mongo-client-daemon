@@ -1,21 +1,61 @@
 {
   "name": "mongo-client-daemon",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "",
-  "main": "build/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "files": [
-    "build/index.d.ts",
-    "build/index.js"
+    "dist"
   ],
   "scripts": {
-    "test": "jest",
-    "build": "node-ts-scripts bundle src/index.ts --dts --format=commonjs --platform=node --outputDir=build"
+    "start": "nodemon --watch src -e ts,tsx --exec npm run build",
+    "test": "echo 'Test'",
+    "build": "tsc --outDir dist"
   },
   "devDependencies": {
     "node-ts-scripts": "^0.27.2"
   },
   "peerDependencies": {
     "mongodb": ">=4.9.0"
+  },
+  "prettier": {
+    "parser": "typescript",
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true
+  },
+  "eslintConfig": {
+      "env": {
+        "browser": true,
+        "es6": true
+      },
+      "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "prettier",
+        "plugin:prettier/recommended",
+        "prettier/@typescript-eslint"
+      ],
+      "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+      },
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+      },
+      "plugins": [
+        "@typescript-eslint"
+      ],
+      "rules": {
+        "@typescript-eslint/ban-ts-ignore": 1
+      }
   },
   "repository": {
     "type": "git",
