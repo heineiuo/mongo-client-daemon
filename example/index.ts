@@ -8,7 +8,7 @@ const collectionName = process.env.collectionName as string
 const connectDB = async (dbName: string): Promise<Db> => {
   const db = new MongoSessionDaemon(mongoUri)
   const session = await db.getSession()
-  return await session.db(dbName)
+  return session.db(dbName)
 }
 
 const findExample = async (): Promise<void> => {
