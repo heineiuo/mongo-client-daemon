@@ -1,4 +1,5 @@
 import Mongodb from 'mongodb'
+import { GenericListener } from 'mongodb'
 
 type MongoSessionDaemonOptions = {
   debug?: boolean
@@ -17,9 +18,9 @@ export class MongoSessionDaemon {
   url: string
   destroyed: boolean
   connected: boolean
-  connectingPromise: Promise<void>
+  connectingPromise?: Promise<void>
   session: Mongodb.MongoClient
-  connectError: Error
+  connectError?: Error
   options: Required<MongoSessionDaemonOptions>
 
   createSession(): void {
@@ -29,12 +30,14 @@ export class MongoSessionDaemon {
 
     this.connectingPromise = new Promise(async (resolve) => {
       let handled = false
-      let errListener = null
-      let connectListener = null
+      let errListener: GenericListener | null = null
+      let connectListener: GenericListener | null = null
 
       connectListener = (): void => {
         if (!handled) {
-          this.session.removeListener('error', errListener)
+          if (errListener) {
+            this.session.removeListener('error', errListener)
+          }
           handled = true
           this.connected = true
           delete this.connectingPromise
@@ -50,7 +53,7 @@ export class MongoSessionDaemon {
       // Only listen connection fail
       errListener = (err: Error): void => {
         if (!handled) {
-          if (this.session) {
+          if (this.session && connectListener) {
             this.session.removeListener('connect', connectListener)
           }
           handled = true
@@ -69,9 +72,8 @@ export class MongoSessionDaemon {
       }
 
       try {
-        this.session = await Mongodb.connect(this.url, {
-          useUnifiedTopology: true,
-        })
+        const client = new Mongodb.MongoClient(this.url)
+        this.session = await client.connect()
         connectListener()
       } catch (e) {
         errListener(e)
@@ -121,7 +123,7 @@ export class MongoSessionDaemon {
 
   async destroy(): Promise<void> {
     this.destroyed = true
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       let resolved = false
       this.session.close(() => {
         if (!resolved) {
